@@ -1,6 +1,9 @@
 class Object:
     def __init__(self, x, y):
         self.possition = [x, y]
+        self.previousPosition = [x, y]
+        self.init = True
+        self.possitionChanged = True
 
     def get_possition(self):
         return [self.possition[0], self.possition[1]]

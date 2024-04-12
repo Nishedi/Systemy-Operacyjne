@@ -33,8 +33,18 @@ class Player(Object):
         elif(self.direction == 'Right'):
             player_image = PhotoImage(file="pictures//player_right.png")
 
-        self.canvas.create_image(self.possition[0]*self.size, self.possition[1]*self.size, anchor='nw', image=player_image)
-        self.canvas.player_image = player_image
+        # self.canvas.create_image(self.possition[0]*self.size, self.possition[1]*self.size, anchor='nw', image=player_image)
+        # self.canvas.player_image = player_image
+
+    def changePhotoDirection(self):
+        if (self.direction == 'Up'):
+            self.player_image = PhotoImage(file="pictures//player_up.png")
+        elif (self.direction == 'Down'):
+            self.player_image = PhotoImage(file="pictures//player_down.png")
+        elif (self.direction == 'Left'):
+            self.player_image = PhotoImage(file="pictures//player_left.png")
+        elif (self.direction == 'Right'):
+            self.player_image = PhotoImage(file="pictures//player_right.png")
 
 
     def add_ammo(self):
@@ -61,8 +71,7 @@ class Player(Object):
     def threadLoop(self):
         while True:
             self.movePlayer(0)
-            # self.show_yourself()
-            time.sleep(0.1)
+            time.sleep(0.5)
     def movePlayer(self, mode=1):
         collision = [0,0,0,0,0]
         for object in self.objects:
@@ -72,6 +81,8 @@ class Player(Object):
             for i in range(5):
                 if collision2[i]==1:
                     collision[i]=1
+        if collision[0]==0:
+            self.possitionChanged = True
         if self.direction == 'Up' and collision[4]!=1:
             self.possition[1] -= 1
         if self.direction == 'Down' and collision[3]!=1:
@@ -80,6 +91,7 @@ class Player(Object):
             self.possition[0] -= 1
         if self.direction == 'Right' and collision[1]!=1:
             self.possition[0] += 1
+
         if mode == 1 and collision[0]==1:
             if collision[1]==1:
                 if collision[3]==1:
@@ -113,9 +125,9 @@ class Player(Object):
             self.direction = random.choice(["Up", "Down", "Left", "Right"])
 
     def steerPlayer(self, event=None, mode=0):
-
         if event.keysym == 'Up' or event.keysym == 'Down' or event.keysym == 'Left' or event.keysym == 'Right':
             self.direction = event.keysym
+            self.changePhotoDirection()
         if event.keysym == 'space':
             self.shoot()
 

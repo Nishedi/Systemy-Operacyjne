@@ -4,6 +4,7 @@ from tkinter import PhotoImage
 from Enemy import Enemy
 from Player import Player
 from Map import MapLoader
+from Bullet import Bullet
 import time
 from tkinter import PhotoImage
 
@@ -35,30 +36,31 @@ def key_press(event):
 
 
 def testThread(objects):
-    prev_positions = {}  # Słownik do przechowywania poprzednich pozycji obiektów
 
     while True:
-        updated_positions = {}  # Aktualne pozycje obiektów w tej iteracji
-
         for obj in objects:
-            # Pobierz aktualną pozycję obiektu
-            current_position = obj.possition
-
-            # Sprawdź, czy pozycja obiektu się zmieniła
-            if current_position != prev_positions.get(obj, None):
-                # Jeśli pozycja się zmieniła, zaktualizuj obiekt na płótnie
-                if isinstance(obj, Enemy):
+            if isinstance(obj, Enemy):
+                if obj.possitionChanged:
+                    obj.possitionChanged = False
                     canvas.delete("enemy")
-                    canvas.create_image(current_position[0] * 40, current_position[1] * 40, anchor='nw', image=obj.image, tags="enemy")
-                elif isinstance(obj, Player):
+                    canvas.create_image(obj.possition[0]*40, obj.possition[1]*40, anchor='nw', image= enemy.image, tags="enemy")
+            if isinstance(obj, Player):
+                if obj.possitionChanged:
+                    obj.possitionChanged = False
                     canvas.delete("player")
-                    canvas.create_image(current_position[0] * 40, current_position[1] * 40, anchor='nw', image=obj.player_image, tags="player")
+                    canvas.create_image(obj.possition[0] * 40, obj.possition[1] * 40, anchor='nw',
+                                        image=obj.player_image, tags="player")
+            if isinstance(obj, Bullet):
+                if obj.possitionChanged:
+                    if obj.isRunning == False:
+                        print("Bullet already  not running")
+                        canvas.delete("rect")
+                        objects.remove(obj)
+                        continue
+                    obj.possionChanged = False
+                    canvas.delete("rect")
+                    canvas.create_rectangle(obj.possition[0]*40, obj.possition[1]*40, obj.possition[0]*40+40, obj.possition[1]*40+40, fill="black", tags="rect")
 
-                # Zapisz aktualną pozycję obiektu
-                updated_positions[obj] = current_position
-
-        # Zapisz aktualne pozycje obiektów jako poprzednie pozycje
-        prev_positions = updated_positions.copy()
 
         time.sleep(0.01)
 

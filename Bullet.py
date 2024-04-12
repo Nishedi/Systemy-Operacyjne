@@ -1,5 +1,6 @@
 import threading
 from Object import Object
+import time
 class Bullet(Object):
     def __init__(self, canva, x, y, direction, objects):
         super().__init__(x, y)
@@ -9,17 +10,18 @@ class Bullet(Object):
         self.canvas = canva
         self.rectangle = self.canvas.create_rectangle(self.x, self.y, self.x+2, self.y+2, fill="black")
         self.objects = objects
+        objects.append(self)
         self.thread = threading.Thread(target=self.threadLoop, args=())
         self.isRunning = True
         self.thread.start()
 
     def threadLoop(self):
-        if not self.isRunning:
-            return
-        print(self.possition)
-        self.move()
-        self.show_yourself()
-        self.canvas.after(10, self.threadLoop)
+        while self.isRunning:
+            print(self.possition)
+            # self.show_yourself()
+            self.move()
+
+            time.sleep(0.1)
 
     def show_yourself(self):
         self.canvas.delete(self.rectangle)
@@ -34,8 +36,10 @@ class Bullet(Object):
                 if collision2[i] == 1:
                     collision[i] = 1
         if collision[0] == 1:
-            self.canvas.delete(self.rectangle)
             self.isRunning = False
+
+        if collision[0] == 0:
+            self.possitionChanged = True
         if self.direction == 'Up' and collision[4] != 1:
             self.possition[1] -= 1
         if self.direction == 'Down' and collision[3] != 1:

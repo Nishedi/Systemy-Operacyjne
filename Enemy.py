@@ -38,7 +38,8 @@ class Enemy(Object):
             for i in range(5):
                 if collision2[i] == 1:
                     collision[i] = 1
-
+        if collision[0] == 0:
+            self.possitionChanged = True
         if self.direction == 'Up' and collision[4] != 1:
             self.possition[1] -= 1
         if self.direction == 'Down' and collision[3] != 1:
