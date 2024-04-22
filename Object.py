@@ -1,13 +1,36 @@
 class Object:
     def __init__(self, x, y):
+        x, y = 1 ,1
         self.possition = [x, y]
         self.previousPosition = [x, y]
         self.init = True
         self.possitionChanged = True
+        self.isRunning = True
 
     def get_possition(self):
         return [self.possition[0], self.possition[1]]
 
+    def checkCollision2(self, map, direction):
+        a = self.possition
+
+        res = [0,0,0,0,0]
+        if map[a[1]][a[0]+1] == 'X':
+            if direction == 'Right':
+                res[0] = 1
+                res[1] = 1
+        if map[a[1]][a[0]-1] == 'X':
+            if direction == 'Left':
+                res[0] = 1
+                res[2] = 1
+        if map[a[1]-1][a[0]] == 'X':
+            if direction == 'Up':
+                res[4] = 1
+                res[0] = 1
+        if map[a[1]+1][a[0]] == 'X':
+            if direction == 'Down':
+                res[3] = 1
+                res[0] = 1
+        return res
     def checkCollision(self, objekt, direction):
         a = self.possition
         p = objekt.get_possition()

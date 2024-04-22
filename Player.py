@@ -7,8 +7,8 @@ import threading
 
 class Player(Object):
 
-    def __init__(self, canvas, x, y, objects, possition):
-        super().__init__(possition[0], possition[1])
+    def __init__(self, canvas, x, y, objects, possition, map):
+        super().__init__(possition[1], possition[0])
         self.size = 40
         self.score = 0
         self.ammo = 10
@@ -16,25 +16,12 @@ class Player(Object):
         self.objects = objects
         self.player_image = PhotoImage(file="pictures/player_right.png")
         self.direction = 'Right'
-        thread = threading.Thread(target=self.threadLoop, args=())
-        thread.start()
+        self.map = map
+        self.thread = threading.Thread(target=self.threadLoop, args=())
+        self.thread.start()
 
     def add_score(self, score):
         self.score += score
-
-
-    def show_yourself(self):
-        if(self.direction == 'Up'):
-            player_image = PhotoImage(file="pictures//player_up.png")
-        elif(self.direction == 'Down'):
-            player_image = PhotoImage(file="pictures//player_down.png")
-        elif(self.direction == 'Left'):
-            player_image = PhotoImage(file="pictures//player_left.png")
-        elif(self.direction == 'Right'):
-            player_image = PhotoImage(file="pictures//player_right.png")
-
-        # self.canvas.create_image(self.possition[0]*self.size, self.possition[1]*self.size, anchor='nw', image=player_image)
-        # self.canvas.player_image = player_image
 
     def changePhotoDirection(self):
         if (self.direction == 'Up'):
@@ -69,20 +56,13 @@ class Player(Object):
         return self.name
 
     def threadLoop(self):
-        while True:
+        while self.isRunning:
             self.movePlayer(0)
             time.sleep(0.5)
     def movePlayer(self, mode=1):
-        collision = [0,0,0,0,0]
-        for object in self.objects:
-            if object is self:
-                continue
-            collision2 = self.checkCollision(object, self.direction)
-            for i in range(5):
-                if collision2[i]==1:
-                    collision[i]=1
+        collision = self.checkCollision2(self.map, self.direction)
         if collision[0]==0:
-            self.possitionChanged = True
+            self.map[self.possition[1]][self.possition[0]]=' '
         if self.direction == 'Up' and collision[4]!=1:
             self.possition[1] -= 1
         if self.direction == 'Down' and collision[3]!=1:
@@ -92,6 +72,7 @@ class Player(Object):
         if self.direction == 'Right' and collision[1]!=1:
             self.possition[0] += 1
 
+        self.map[self.possition[1]][self.possition[0]] = 'P'
         if mode == 1 and collision[0]==1:
             if collision[1]==1:
                 if collision[3]==1:
@@ -124,10 +105,11 @@ class Player(Object):
         while self.direction in forbidden_directions:
             self.direction = random.choice(["Up", "Down", "Left", "Right"])
 
-    def steerPlayer(self, event=None, mode=0):
+    def steerPlayer(self, event=None):
         if event.keysym == 'Up' or event.keysym == 'Down' or event.keysym == 'Left' or event.keysym == 'Right':
             self.direction = event.keysym
             self.changePhotoDirection()
+
         if event.keysym == 'space':
             self.shoot()
 

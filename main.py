@@ -13,8 +13,8 @@ root = None
 direction = 1
 directionx = 1
 directiony = 1
-width = 1280
-height = 720
+width = 1880
+height = 1160
 
 
 
@@ -34,42 +34,24 @@ def createWindow(windowSize):
 def key_press(event):
     player.steerPlayer(event)
 
-
-def testThread(objects):
-
-    while True:
-        for obj in objects:
-            if isinstance(obj, Enemy):
-                if obj.possitionChanged:
-                    obj.possitionChanged = False
-                    canvas.delete("enemy")
-                    canvas.create_image(obj.possition[0]*40, obj.possition[1]*40, anchor='nw', image= enemy.image, tags="enemy")
-            if isinstance(obj, Player):
-                if obj.possitionChanged:
-                    obj.possitionChanged = False
-                    canvas.delete("player")
-                    canvas.create_image(obj.possition[0] * 40, obj.possition[1] * 40, anchor='nw',
-                                        image=obj.player_image, tags="player")
-            if isinstance(obj, Bullet):
-                if obj.possitionChanged:
-                    if obj.isRunning == False:
-                        print("Bullet already  not running")
-                        canvas.delete("rect")
-                        objects.remove(obj)
-                        continue
-                    obj.possionChanged = False
-                    canvas.delete("rect")
-                    canvas.create_rectangle(obj.possition[0]*40, obj.possition[1]*40, obj.possition[0]*40+40, obj.possition[1]*40+40, fill="black", tags="rect")
-
-
-        time.sleep(0.01)
-
-
 def mainLoop(player):
+    canvas.delete("border")
+    for i in range(len(map.map2)):
+        for j in range(len(map.map2[i])):
+            if map.map2[i][j] == 'X':
+                canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="white", tags="border")
+            if map.map2[i][j] == 'P':
+                canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="yellow", tags="border")
+            if map.map2[i][j] == 'E':
+                canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="green", tags="border")
     canvas.delete("ammo_text")
     canvas.create_text(width - 75, 25, text="bullets: " + str(player.ammo), fill="black",
                             font=('Helvetica', 15), tags="ammo_text")
     canvas.delete("score")
+    canvas.delete("player")
+    canvas.create_image(player.possition[0] * 40, player.possition[1] * 40, anchor='nw',
+                        image=player.player_image, tags="player")
+
     root.after(100, lambda : mainLoop(player))
 
 
@@ -82,17 +64,27 @@ createWindow(map.get_size())
 
 
 root.bind('<Key>', key_press)
-player = Player(canvas, width, height, objects, map.findEmptyPlace())
-objects.append(player)
 for object in map.get_map():
     objects.append(object)
-enemy = Enemy(canvas, objects, map.findEmptyPlace())
+player = Player(canvas, width, height, objects, map.findEmptyPlace(),map.map2)
+objects.append(player)
+
+
+enemy = Enemy(canvas, objects, map.findEmptyPlace(), map.map2)
 objects.append(enemy)
 
-threading.Thread(target=testThread, args=(objects,)).start()
+def on_closing():
+    print("Okno zostało zamknięte.")
+    stop = True
 
-for object in map.get_map():
-    canvas.create_rectangle(object.possition[0]*40, object.possition[1]*40, object.possition[0]*40+40, object.possition[1]*40+40, fill="white")
+    player.isRunning = False
+    player.thread.join()
+    root.destroy()
+
+
+
+root.protocol("WM_DELETE_WINDOW", on_closing)
+
 mainLoop(player)
 root.mainloop()
 
