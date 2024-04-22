@@ -1,18 +1,22 @@
+import random
+import threading
 class Object:
-    def __init__(self, x, y):
-        x, y = 1 ,1
+    def __init__(self, x, y, map):
         self.possition = [x, y]
-        self.previousPosition = [x, y]
-        self.init = True
-        self.possitionChanged = True
+        self.map = map
         self.isRunning = True
+        self.thread = threading.Thread(target=self.threadLoop, args=())
+
 
     def get_possition(self):
         return [self.possition[0], self.possition[1]]
 
+    def threadLoop(self):
+        while self.isRunning:
+            pass
+
     def checkCollision2(self, map, direction):
         a = self.possition
-
         res = [0,0,0,0,0]
         if map[a[1]][a[0]+1] == 'X':
             if direction == 'Right':
@@ -31,30 +35,47 @@ class Object:
                 res[3] = 1
                 res[0] = 1
         return res
-    def checkCollision(self, objekt, direction):
-        a = self.possition
-        p = objekt.get_possition()
-        res = [0,0,0,0,0]
-        r, l, u, d = 0, 0, 0, 0
-        if direction == 'Right':
-            r = 1
-        if direction == 'Left':
-            l = -1
-        if direction == 'Down':
-            d = 1
-        if direction == 'Up':
-            u = -1
+    def move(self, mode=1):
+        collision = self.checkCollision2(self.map, self.direction)
+        if collision[0]==0:
+            self.map[self.possition[1]][self.possition[0]]=' '
+        if self.direction == 'Up' and collision[4]!=1:
+            self.possition[1] -= 1
+        if self.direction == 'Down' and collision[3]!=1:
+            self.possition[1] += 1
+        if self.direction == 'Left' and collision[2]!=1:
+            self.possition[0] -= 1
+        if self.direction == 'Right' and collision[1]!=1:
+            self.possition[0] += 1
 
-        if a[0]+r == p[0] and a[1] == p[1]: #right
-            res[0]=1
-            res[1]=1
-        if a[0]+l == p[0] and a[1] == p[1]: #left
-            res[0]=1
-            res[2]=1
-        if a[1]+d == p[1] and a[0] == p[0]: #down
-            res[0]=1
-            res[3]=1
-        if a[1]+u == p[1] and a[0] == p[0]: #up
-            res[0]=1
-            res[4]=1
-        return res
+        self.map[self.possition[1]][self.possition[0]] = self.letter
+        if mode == 1 and collision[0]==1:
+            if collision[1]==1:
+                if collision[3]==1:
+                    self.setDirection(['Down','Right'])
+                elif collision[4]==1:
+                    self.setDirection(['Up','Right'])
+                else:
+                    self.setDirection(['Right'])
+            elif collision[2]==1:
+                if collision[3]==1:
+                    self.setDirection(['Left', 'Down'])
+                elif collision[4]==1:
+                    self.setDirection(['Left','Up'])
+                else:
+                    self.setDirection(['Left'])
+            else:
+                if collision[3]==1:
+                    self.setDirection(['Down'])
+                elif collision[4]==1:
+                    self.setDirection(['Up'])
+                else:
+                    self.setDirection(['Right'])
+        elif mode == 1 and random.randint(0, 5) == 0:
+            self.setDirection([])
+    def setDirection(self, forbidden_directions):
+        if len(forbidden_directions) == 4:
+            return
+        self.direction = random.choice(["Up", "Down", "Left", "Right"])
+        while self.direction in forbidden_directions:
+            self.direction = random.choice(["Up", "Down", "Left", "Right"])
