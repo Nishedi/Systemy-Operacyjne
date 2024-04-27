@@ -1,54 +1,76 @@
 import random
 import threading
+import time
 class Object:
     def __init__(self, x, y, map):
         self.possition = [x, y]
-        self.map = map
+        self.mapObject = map
+        self.map = self.mapObject.map
         self.isRunning = True
         self.thread = threading.Thread(target=self.threadLoop, args=())
+        self.mutex = threading.Lock()
 
 
     def get_possition(self):
-        return [self.possition[0], self.possition[1]]
+        try:
+            self.mutex.acquire()
+            possition = [self.possition[0], self.possition[1]]
+        finally:
+            self.mutex.release()
+        return possition
 
     def threadLoop(self):
         while self.isRunning:
             pass
 
+
+
     def checkCollision2(self, map, direction):
         a = self.possition
         res = [0,0,0,0,0]
-        if map[a[1]][a[0]+1] == 'X':
+        objectsToCheck = ['X', 'E', 'P']
+
+        right = self.mapObject.get_what_is_in(a[0]+1, a[1])
+        left = self.mapObject.get_what_is_in(a[0]-1, a[1])
+        up = self.mapObject.get_what_is_in(a[0], a[1]-1)
+        down = self.mapObject.get_what_is_in(a[0], a[1]+1)
+        if right == 'X' or right == 'E' or right == 'P':
             if direction == 'Right':
                 res[0] = 1
                 res[1] = 1
-        if map[a[1]][a[0]-1] == 'X':
+        if left == 'X' or left == 'E' or left == 'P':
             if direction == 'Left':
                 res[0] = 1
                 res[2] = 1
-        if map[a[1]-1][a[0]] == 'X':
+        if up == 'X' or up == 'E' or up == 'P':
             if direction == 'Up':
+                res[0] = 1
                 res[4] = 1
-                res[0] = 1
-        if map[a[1]+1][a[0]] == 'X':
+        if down == 'X' or down == 'E' or down == 'P':
             if direction == 'Down':
-                res[3] = 1
                 res[0] = 1
+                res[3] = 1
+
+
+
         return res
     def move(self, mode=1):
         collision = self.checkCollision2(self.map, self.direction)
-        if collision[0]==0:
-            self.map[self.possition[1]][self.possition[0]]=' '
-        if self.direction == 'Up' and collision[4]!=1:
-            self.possition[1] -= 1
-        if self.direction == 'Down' and collision[3]!=1:
-            self.possition[1] += 1
-        if self.direction == 'Left' and collision[2]!=1:
-            self.possition[0] -= 1
-        if self.direction == 'Right' and collision[1]!=1:
-            self.possition[0] += 1
-
-        self.map[self.possition[1]][self.possition[0]] = self.letter
+        try:
+            self.mutex.acquire()
+            if collision[0]==0:
+                self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
+            if self.direction == 'Up' and collision[4]!=1:
+                self.possition[1] -= 1
+            if self.direction == 'Down' and collision[3]!=1:
+                self.possition[1] += 1
+            if self.direction == 'Left' and collision[2]!=1:
+                self.possition[0] -= 1
+            if self.direction == 'Right' and collision[1]!=1:
+                self.possition[0] += 1
+            self.map[self.possition[1]][self.possition[0]] = self.letter
+        finally:
+            self.mutex.release()
         if mode == 1 and collision[0]==1:
             if collision[1]==1:
                 if collision[3]==1:

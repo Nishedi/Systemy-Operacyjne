@@ -1,4 +1,4 @@
-import threading
+from ThreadsMenager import ThreadMenager
 import tkinter as tk
 from Enemy import Enemy
 from Player import Player
@@ -11,7 +11,7 @@ height = 1160
 
 
 def createWindow(windowSize):
-    global canvas, root
+    global canvas, root, photo
     root = tk.Tk()
     width = windowSize[1]
     height = windowSize[0]
@@ -23,16 +23,21 @@ def createWindow(windowSize):
 def key_press(event):
     player.steerPlayer(event)
 
+def on_closing(threadMenager):
+    print("Okno zostało zamknięte.")
+    threadMenager.closeAll()
+    root.destroy()
+
 def mainLoop(player):
+    photo = tk.PhotoImage(file="pictures/mob.png")
     canvas.delete("border")
     for i in range(len(map.map)):
         for j in range(len(map.map[i])):
             if map.map[i][j] == 'X':
                 canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="grey", tags="border")
             if map.map[i][j] == 'E':
-                global photo
-                photo = tk.PhotoImage(file="pictures/mob.png")
-                canvas.create_image(j * 40, i * 40, anchor='nw', image=photo, tags="border")
+                canvas.create_image(j * 40, i * 40, anchor='nw', image=photo)
+                canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="yellow", tags="border")
             if map.map[i][j] == 'B':
                 canvas.create_rectangle(j * 40+19, i * 40+19, j * 40 + 21, i * 40 + 21, fill="black", tags="border")
     canvas.delete("ammo_text")
@@ -48,24 +53,12 @@ def mainLoop(player):
 
 map = MapLoader("Resources/map.txt")
 createWindow(map.get_size())
-objects = []
+threadMenager = ThreadMenager(map)
+player = Player(threadMenager, map.findEmptyPlace(), map)
+threadMenager.add_thread(player)
+
+
 root.bind('<Key>', key_press)
-
-player = Player(objects, map.findEmptyPlace(), map.map)
-objects.append(player)
-enemy = Enemy(map.findEmptyPlace(), map.map)
-objects.append(enemy)
-
-def on_closing():
-    print("Okno zostało zamknięte.")
-    player.isRunning = False
-    player.thread.join()
-    enemy.isRunning = False
-    enemy.thread.join()
-    root.destroy()
-
-root.protocol("WM_DELETE_WINDOW", on_closing)
+root.protocol("WM_DELETE_WINDOW", lambda: on_closing(threadMenager))
 mainLoop(player)
 root.mainloop()
-
-# if __name__ == '__main__':
