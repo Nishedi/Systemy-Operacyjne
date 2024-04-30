@@ -65,7 +65,30 @@ class Player(Object):
             self.move(0)
             time.sleep(0.5)
 
+    def checkMap(self):
+        if self.mapObject.get_what_is_in(self.possition[0], self.possition[1]) == 'A':
+            self.add_ammo()
+    def move(self, mode=1):
+        collision = [0,0,0,0,0]
+        try:
+            self.mapObject.mutex.acquire()
+            collision = self.checkCollision(self.map, self.direction)
 
+            if collision[0]==0:
+                self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
+            if self.direction == 'Up' and collision[4]!=1:
+                self.possition[1] -= 1
+            if self.direction == 'Down' and collision[3]!=1:
+                self.possition[1] += 1
+            if self.direction == 'Left' and collision[2]!=1:
+                self.possition[0] -= 1
+            if self.direction == 'Right' and collision[1]!=1:
+                self.possition[0] += 1
+            self.checkMap()
+            self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
+
+        finally:
+            self.mapObject.mutex.release()
 
 
     def steerPlayer(self, event=None):
