@@ -33,6 +33,8 @@ def mainLoop(player):
     canvas.delete("border")
     for i in range(len(map.map)):
         for j in range(len(map.map[i])):
+            if map.map[i][j] == 'A':
+                canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="grey", tags="border")
             if map.map[i][j] == 'X':
                 canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="grey", tags="border")
             if map.map[i][j] == 'E':

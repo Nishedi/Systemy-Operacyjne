@@ -10,14 +10,23 @@ class Enemy(Object):
         self.directions = ['Up', 'Down', 'Left', 'Right']
         self.direction = self.directions[random.randint(0,3)]
         self.letter = 'E'
-        self.map[self.possition[1]][self.possition[0]] = self.letter
+        self.spawn()
         self.thread.start()
+
+    def spawn(self):
+        try:
+            self.mapObject.mutex.acquire()
+            possition = self.mapObject.findEmptyPlace()
+            self.possition[0], self.possition[1] = possition[1], possition[0]
+            self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
+        finally:
+            self.mapObject.mutex.release()
+
     def threadLoop(self):
         while self.isRunning:
             self.move()
             time.sleep(1+random.randint(0,100)/1000)
-        self.map[self.possition[1]][self.possition[0]] = ' '
-        print("dead")
+        self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
 
 
 

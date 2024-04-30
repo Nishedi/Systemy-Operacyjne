@@ -15,15 +15,22 @@ class Player(Object):
         self.threadMenager = threadMenager
         self.player_image = PhotoImage(file="pictures/player_right.png")
         self.letter = 'P'
-        self.map[self.possition[1]][self.possition[0]] = self.letter
+        self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
         self.direction = 'Right'
-
+        self.spawn()
         self.thread.start()
 
 
     def add_score(self, score):
         self.score += score
-
+    def spawn(self):
+        try:
+            self.mapObject.mutex.acquire()
+            possition = self.mapObject.findEmptyPlace()
+            self.possition[0], self.possition[1] = possition[1], possition[0]
+            self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
+        finally:
+            self.mapObject.mutex.release()
     def changePhotoDirection(self):
         if (self.direction == 'Up'):
             self.player_image = PhotoImage(file="pictures//player_up.png")

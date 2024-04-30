@@ -7,7 +7,7 @@ class Bullet(Object):
         super().__init__(x, y, map)
         self.direction = direction
         self.threadMenager = threadMenager
-        self.map[self.possition[1]][self.possition[0]] = 'B'
+        self.mapObject.update_map(self.possition[0], self.possition[1], 'B')
         self.thread.start()
 
 
@@ -15,9 +15,8 @@ class Bullet(Object):
         while self.isRunning:
             self.move()
             time.sleep(0.1)
-        self.map[self.possition[1]][self.possition[0]] = ' '
 
-    def checkCollision2(self, map, direction):
+    def checkCollision(self, map, direction):
         a = self.possition
         res = [0,0,0,0,0]
 
@@ -42,20 +41,26 @@ class Bullet(Object):
                 res[0] = 1
                 res[3] = 1
         return res
-    def move(self, mode=1):
-        collision = self.checkCollision2(self.map, self.direction)
-        if collision[0] == 0:
-            self.map[self.possition[1]][self.possition[0]] = ' '
-        if self.direction == 'Up' and collision[4] != 1:
-            self.possition[1] -= 1
-        if self.direction == 'Down' and collision[3] != 1:
-            self.possition[1] += 1
-        if self.direction == 'Left' and collision[2] != 1:
-            self.possition[0] -= 1
-        if self.direction == 'Right' and collision[1] != 1:
-            self.possition[0] += 1
-        self.map[self.possition[1]][self.possition[0]] = 'B'
-        if collision[0] == 1:
-            self.isRunning = False
 
-        self.threadMenager.checkHitting(self.possition)
+    def move(self, mode=1):
+        try:
+            self.mapObject.mutex.acquire()
+            collision = self.checkCollision(self.map, self.direction)
+            if collision[0] == 0:
+                self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
+            if self.direction == 'Up' and collision[4] != 1:
+                self.possition[1] -= 1
+            if self.direction == 'Down' and collision[3] != 1:
+                self.possition[1] += 1
+            if self.direction == 'Left' and collision[2] != 1:
+                self.possition[0] -= 1
+            if self.direction == 'Right' and collision[1] != 1:
+                self.possition[0] += 1
+
+            if collision[0] == 1 or self.threadMenager.checkHitting(self.possition):
+                self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
+                self.isRunning = False
+                return
+            self.mapObject.update_map(self.possition[0], self.possition[1], 'B')
+        finally:
+            self.mapObject.mutex.release()
