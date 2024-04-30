@@ -3,12 +3,13 @@ from Object import Object
 import time
 from Enemy import Enemy
 class Bullet(Object):
-    def __init__(self, x, y, direction, threadMenager, map):
+    def __init__(self, x, y, direction, threadMenager, map, player):
         super().__init__(x, y, map)
         self.direction = direction
         self.threadMenager = threadMenager
         self.mapObject.update_map(self.possition[0], self.possition[1], 'B')
         self.thread.start()
+        self.player = player
 
 
     def threadLoop(self):
@@ -58,6 +59,7 @@ class Bullet(Object):
                 self.possition[0] += 1
 
             if collision[0] == 1 or self.threadMenager.checkHitting(self.possition):
+                self.player.addOneScore()
                 self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
                 self.isRunning = False
                 return

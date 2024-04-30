@@ -1,6 +1,6 @@
 from ThreadsMenager import ThreadMenager
 import tkinter as tk
-from Enemy import Enemy
+from Photos import Photos
 from Player import Player
 from Map import MapLoader
 from tkinter import PhotoImage
@@ -28,29 +28,32 @@ def on_closing(threadMenager):
     threadMenager.closeAll()
     root.destroy()
 
-def mainLoop(player):
-    photo = tk.PhotoImage(file="pictures/mob.png")
+def mainLoop(player, photos):
     canvas.delete("border")
+    canvas.delete('enemy')
+    canvas.delete('ammo')
     for i in range(len(map.map)):
         for j in range(len(map.map[i])):
             if map.map[i][j] == 'A':
-                canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="Black", tags="border")
+                canvas.create_image(j * 40, i * 40, anchor='nw', image=photos.ammo, tags='ammo')
             if map.map[i][j] == 'X':
-                canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="grey", tags="border")
+                canvas.create_image(j * 40, i * 40, anchor='nw', image=photos.wall, tags='border')
             if map.map[i][j] == 'E':
-                canvas.create_image(j * 40, i * 40, anchor='nw', image=photo)
-                canvas.create_rectangle(j * 40, i * 40, j * 40 + 40, i * 40 + 40, fill="yellow", tags="border")
+                canvas.create_image(j * 40, i * 40, anchor='nw', image=photos.enemy, tags='enemy')
             if map.map[i][j] == 'B':
                 canvas.create_rectangle(j * 40+19, i * 40+19, j * 40 + 21, i * 40 + 21, fill="black", tags="border")
     canvas.delete("ammo_text")
+    canvas.delete("score")
     canvas.create_text(width - 75, 25, text="bullets: " + str(player.ammo), fill="black",
                             font=('Helvetica', 15), tags="ammo_text")
-    canvas.delete("score")
+    canvas.create_text(width - 150, 25, text="score: " + str(player.score), fill="black",
+                       font=('Helvetica', 15), tags="score")
+
     canvas.delete("player")
     canvas.create_image(player.possition[0] * 40, player.possition[1] * 40, anchor='nw',
                         image=player.player_image, tags="player")
 
-    root.after(100, lambda : mainLoop(player))
+    root.after(100, lambda : mainLoop(player, photos))
 
 
 map = MapLoader("Resources/map.txt")
@@ -62,5 +65,5 @@ threadMenager.add_thread(player)
 
 root.bind('<Key>', key_press)
 root.protocol("WM_DELETE_WINDOW", lambda: on_closing(threadMenager))
-mainLoop(player)
+mainLoop(player, Photos())
 root.mainloop()

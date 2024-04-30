@@ -21,6 +21,12 @@ class Player(Object):
         self.thread.start()
 
 
+    def addOneScore(self):
+        try:
+            self.mutex.acquire()
+            self.score += 1
+        finally:
+            self.mutex.release()
     def add_score(self, score):
         self.score += score
     def spawn(self):
@@ -49,13 +55,13 @@ class Player(Object):
         if self.ammo > 0:
             self.ammo -= 1
             if self.direction == 'Right':
-                Bullet(self.get_possition()[0]+1, self.get_possition()[1], self.direction, self.threadMenager, self.mapObject)
+                Bullet(self.get_possition()[0]+1, self.get_possition()[1], self.direction, self.threadMenager, self.mapObject, self)
             if self.direction == 'Left':
-                Bullet(self.get_possition()[0]-1, self.get_possition()[1], self.direction, self.threadMenager, self.mapObject)
+                Bullet(self.get_possition()[0]-1, self.get_possition()[1], self.direction, self.threadMenager, self.mapObject, self)
             if self.direction == 'Up':
-                Bullet(self.get_possition()[0], self.get_possition()[1]-1, self.direction, self.threadMenager, self.mapObject)
+                Bullet(self.get_possition()[0], self.get_possition()[1]-1, self.direction, self.threadMenager, self.mapObject, self)
             if self.direction == 'Down':
-                Bullet(self.get_possition()[0], self.get_possition()[1]+1, self.direction, self.threadMenager, self.mapObject)
+                Bullet(self.get_possition()[0], self.get_possition()[1]+1, self.direction, self.threadMenager, self.mapObject, self)
 
     def get_score(self):
         return self.score

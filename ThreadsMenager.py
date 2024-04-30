@@ -8,17 +8,32 @@ class ThreadMenager:
         self.allThreads = []
         self.mutex = threading.Lock()
         self.isRunning = True
+        self.oderThreads = []
         self.bulletsDropperThread = threading.Thread(target=self.bulletsDropper, args=(map,))
         self.bulletsDropperThread.start()
-        # for i in range(10):
-        #     self.add_thread(Enemy(map.findEmptyPlace(), map))
+        self.mobSpawner = threading.Thread(target=self.mobSpawner, args=(map,))
+        self.mobSpawner.start()
+
+        for i in range(10):
+            self.add_thread(Enemy(map.findEmptyPlace(), map))
+
+    def mobSpawner(self, map):
+        while not self.isRunning:
+            try:
+                map.mutex.acquire()
+                self.add_thread(Enemy(map.findEmptyPlace(), map))
+            finally:
+                map.mutex.release()
+            time.sleep(10)
 
     def bulletsDropper(self, map):
         while self.isRunning:
-            map.mutex.acquire()
-            possition = map.findEmptyPlace()
-            map.update_map(possition[1], possition[0], 'A')
-            map.mutex.release()
+            try:
+                map.mutex.acquire()
+                possition = map.findEmptyPlace()
+                map.update_map(possition[1], possition[0], 'A')
+            finally:
+                map.mutex.release()
             time.sleep(10)
 
 
@@ -40,6 +55,7 @@ class ThreadMenager:
     def closeAll(self):
         self.isRunning = False
         self.bulletsDropperThread.join()
+        self.mobSpawner.join()
         for thread in self.allThreads:
             thread.isRunning = False
             thread.thread.join()
