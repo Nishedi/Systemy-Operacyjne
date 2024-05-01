@@ -34,6 +34,7 @@ def mainLoop(player, photos):
     canvas.delete('ammo')
     for i in range(len(map.map)):
         for j in range(len(map.map[i])):
+            # print(map.map[i][j], end="")
             if map.map[i][j] == 'A':
                 canvas.create_image(j * 40, i * 40, anchor='nw', image=photos.ammo, tags='ammo')
             if map.map[i][j] == 'X':
@@ -42,6 +43,7 @@ def mainLoop(player, photos):
                 canvas.create_image(j * 40, i * 40, anchor='nw', image=photos.enemy, tags='enemy')
             if map.map[i][j] == 'B':
                 canvas.create_rectangle(j * 40+19, i * 40+19, j * 40 + 21, i * 40 + 21, fill="black", tags="border")
+        # print()
     canvas.delete("ammo_text")
     canvas.delete("score")
     canvas.create_text(width - 75, 25, text="bullets: " + str(player.ammo), fill="black",

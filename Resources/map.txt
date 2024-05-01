@@ -1,5 +1,5 @@
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
-Xabcdefghijklmnoprstuwxyzabcdef         XXXX  X
+X                                       XXXX  X
 X   XXXXXXX     XXXXXXX                       X
 X   XXXXXXX     XXXXXXX        XXXXXXX        X
 X   XXX  XX     XXXXXXX          XXXXX        X

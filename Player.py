@@ -15,7 +15,8 @@ class Player(Object):
         self.threadMenager = threadMenager
         self.player_image = PhotoImage(file="pictures/player_right.png")
         self.letter = 'P'
-        self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
+        # self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
+
         self.direction = 'Right'
         self.spawn()
         self.thread.start()
@@ -80,16 +81,16 @@ class Player(Object):
             self.mapObject.mutex.acquire()
             collision = self.checkCollision(self.map, self.direction)
 
-            if collision[0]==0:
-                self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
-            if self.direction == 'Up' and collision[4]!=1:
-                self.possition[1] -= 1
-            if self.direction == 'Down' and collision[3]!=1:
-                self.possition[1] += 1
-            if self.direction == 'Left' and collision[2]!=1:
-                self.possition[0] -= 1
-            if self.direction == 'Right' and collision[1]!=1:
-                self.possition[0] += 1
+            # if collision[0]==0:
+            #     self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
+            # if self.direction == 'Up' and collision[4]!=1:
+            #     self.possition[1] -= 1
+            # if self.direction == 'Down' and collision[3]!=1:
+            #     self.possition[1] += 1
+            # if self.direction == 'Left' and collision[2]!=1:
+            #     self.possition[0] -= 1
+            # if self.direction == 'Right' and collision[1]!=1:
+            #     self.possition[0] += 1
             self.checkMap()
             self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
 

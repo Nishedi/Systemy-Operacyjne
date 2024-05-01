@@ -24,7 +24,6 @@ class Object:
             pass
 
 
-
     def checkCollision(self, map, direction):
         a = self.possition
         res = [0,0,0,0,0]
@@ -49,9 +48,6 @@ class Object:
             if direction == 'Down':
                 res[0] = 1
                 res[3] = 1
-
-
-
         return res
     def move(self, mode=1):
         collision = [0,0,0,0,0]
