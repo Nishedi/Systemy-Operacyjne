@@ -7,8 +7,6 @@ class Enemy(Object):
 
     def __init__(self, possition, map):
         super().__init__(possition[1], possition[0], map)
-        self.directions = ['Up', 'Down', 'Left', 'Right']
-        self.direction = self.directions[random.randint(0,3)]
         self.letter = 'E'
         self.spawn()
         self.thread.start()
@@ -22,31 +20,44 @@ class Enemy(Object):
         finally:
             self.mapObject.mutex.release()
 
-    def findPlayer(self):
-        for i in range(len(self.mapObject.map)):
-            for j in range(len(self.mapObject.map[i])):
+    def findPlayer(self, distance=10):
+        for i in range(self.possition[1] - distance, self.possition[1] + distance):
+            for j in range(self.possition[0] - distance, self.possition[0] + distance):
+                if i < 0 or j < 0 or i >= len(self.mapObject.map) or j >= len(self.mapObject.map[i]):
+                    continue
                 if self.mapObject.map[i][j] == 'P':
                     return (j, i)
+        return False
 
-    def checkCollision2(self, map, possition):
+    def checkCollision2(self, possition):
         a = possition
         if self.mapObject.get_what_is_in(a[0], a[1]) == 'E':
             return 1
+        if self.mapObject.get_what_is_in(a[0], a[1]) == 'X':
+            return 1
+        if self.mapObject.get_what_is_in(a[0], a[1]) == 'P':
+            return 1
         return 0
+
     def move(self, mode=1):
-        collision = [0,0,0,0,0]
         try:
             self.mapObject.mutex.acquire()
-            collision = self.checkCollision(self.map, self.direction)
             self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
-            possition = self.algorithm(self.findPlayer())
-            if possition and self.checkCollision2(self.map, possition)==0:
-                self.possition = possition
+            playerPossition = self.findPlayer()
+            if playerPossition:
+                possition = self.algorithm(playerPossition)
+            if not playerPossition or not possition:
+                goodNeighbours = []
+                for neighbour in self.createNeighbours(self.possition):
+                    if self.checkCollision2(neighbour)==0:
+                        goodNeighbours.append(neighbour)
+                if len(goodNeighbours) == 0:
+                    return
+                possition = goodNeighbours[random.randint(0, len(goodNeighbours)-1)]
+            self.possition = possition
             self.mapObject.update_map(self.possition[0],self.possition[1], self.letter)
-
         finally:
             self.mapObject.mutex.release()
-
 
     def createNeighbours(self, possition):
         neighbours = []
@@ -73,17 +84,15 @@ class Enemy(Object):
             for neighbour in neighbours:
                 if self.mapObject.map[neighbour[1]][neighbour[0]] == 'X': continue
                 if self.mapObject.map[neighbour[1]][neighbour[0]] == 'P': continue
-                # if self.mapObject.map[neighbour[1]][neighbour[0]] == 'E': continue
                 if distanceMap[neighbour[1]][neighbour[0]] == 1000000:
                     distanceMap[neighbour[1]][neighbour[0]] = distanceMap[current[1]][current[0]] + 1
                     queue.append(neighbour)
         neighbours = self.createNeighbours(endPosition)
-        toreturn = []
         if distanceMap[endPosition[1]][endPosition[0]] == 1:
             return False
         for neighbour in neighbours:
             if int(distanceMap[neighbour[1]][neighbour[0]]) < int(distanceMap[endPosition[1]][endPosition[0]]):
-                if self.checkCollision2(self.map, neighbour)==0:
+                if self.checkCollision2(neighbour)==0:
                     return neighbour
 
         return False

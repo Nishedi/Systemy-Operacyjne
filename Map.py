@@ -27,6 +27,7 @@ class MapLoader:
         return self.map[y][x]
 
 
+
     def update_map(self, x, y, letter):
         self.map[y][x] = letter
 
