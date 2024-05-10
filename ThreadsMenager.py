@@ -15,13 +15,15 @@ class ThreadMenager:
         self.mobSpawner.start()
 
         for i in range(10):
-            self.add_thread(Enemy(map.findEmptyPlace(), map))
+            self.add_thread(Enemy(map.findEmptyPlace(), map, self))
+
+
 
     def mobSpawner(self, map):
         while not self.isRunning:
             try:
                 map.mutex.acquire()
-                self.add_thread(Enemy(map.findEmptyPlace(), map))
+                self.add_thread(Enemy(map.findEmptyPlace(), map, self))
             finally:
                 map.mutex.release()
             time.sleep(10)

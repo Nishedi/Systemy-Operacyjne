@@ -5,10 +5,11 @@ from Object import Object
 
 class Enemy(Object):
 
-    def __init__(self, possition, map):
+    def __init__(self, possition, map, threadMenager):
         super().__init__(possition[1], possition[0], map)
         self.letter = 'E'
         self.spawn()
+        self.threadMenager = threadMenager
         self.thread.start()
 
     def spawn(self):
@@ -36,6 +37,7 @@ class Enemy(Object):
         if self.mapObject.get_what_is_in(a[0], a[1]) == 'X':
             return 1
         if self.mapObject.get_what_is_in(a[0], a[1]) == 'P':
+            self.threadMenager.closeAll()
             return 1
         return 0
 

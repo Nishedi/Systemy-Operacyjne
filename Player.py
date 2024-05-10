@@ -71,6 +71,7 @@ class Player(Object):
         while self.isRunning:
             self.move(0)
             time.sleep(0.5)
+        print("End of the game!")
 
     def checkMap(self):
         if self.mapObject.get_what_is_in(self.possition[0], self.possition[1]) == 'A':
