@@ -14,6 +14,18 @@ class ThreadMenager:
         self.mobSpawner = threading.Thread(target=self.mobSpawner, args=(map,)) # this is a thread that will spawn enemies
         self.mobSpawnerPeriod = 10 # same as above
         self.mobSpawnerStatus = 0
+        self.startTime = time.time()
+
+    def setDifficulty(self, difficulty): # this is a method that will set difficulty of the game
+        if difficulty == 0:
+            self.bulletsDropperPeriod = 5
+            self.mobSpawnerPeriod = 10
+        if difficulty == 1:
+            self.bulletsDropperPeriod = 7
+            self.mobSpawnerPeriod = 7
+        if difficulty == 2:
+            self.bulletsDropperPeriod = 10
+            self.mobSpawnerPeriod = 5
 
     def startThreads(self): # this method will start all threads = start the game
         for thread in self.allThreads:
@@ -22,7 +34,11 @@ class ThreadMenager:
         self.mobSpawner.start()
 
     def mobSpawner(self, map): # this is a method that will spawn enemies used in mobSpawner thread
+        incrementer = 1
         while self.isRunning:
+            if time.time()-self.startTime>30*incrementer:
+                incrementer+=1
+                self.mobSpawnerPeriod-=1
             self.mobSpawnerStatus = 0
             while self.mobSpawnerStatus < self.mobSpawnerPeriod:
                 time.sleep(1)
@@ -40,7 +56,8 @@ class ThreadMenager:
             try:
                 map.mutex.acquire()
                 possition = map.findEmptyPlace()
-                map.update_map(possition[1], possition[0], 'A')
+                if possition:
+                    map.update_map(possition[1], possition[0], 'A')
             finally:
                 map.mutex.release()
 

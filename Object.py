@@ -38,7 +38,6 @@ class Object:
     def checkCollision(self, map, direction):
         a = self.possition
         res = [0,0,0,0,0]
-
         right = self.mapObject.get_what_is_in(a[0]+1, a[1])
         left = self.mapObject.get_what_is_in(a[0]-1, a[1])
         up = self.mapObject.get_what_is_in(a[0], a[1]-1)

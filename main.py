@@ -11,11 +11,11 @@ width = 1880
 height = 1160
 start = False
 startTime = time.time()
-difficultMode = [1, 0, 0]
+difficultMode = 0
 checkBoxes = []
 
 
-def createWindow(windowSize, threadMenager):
+def createWindow(windowSize, threadMenager, map):
     global canvas, root, photo, checkBoxes, width, height
     root = tk.Tk()
     width = windowSize[1]
@@ -42,29 +42,24 @@ def createWindow(windowSize, threadMenager):
     checkBoxes[0].select()
     for i in checkBoxes:
         i.pack()
-    button = tk.Button(startFrame, text="Start", width=40, height=2, command=lambda: startGame(startFrame, threadMenager))
+    button = tk.Button(startFrame, text="Start", width=40, height=2, command=lambda: startGame(startFrame, threadMenager, map))
     button.pack()
     startFrame.place(relx=0.5, rely=0.5, anchor="center")
     canvas = tk.Canvas(root, width=width, height=height, bg="white")
 
 
 def selectDifficulty(whoCalled):
+    global difficultMode
     if whoCalled == 0:
-        difficultMode[0] = 1
-        difficultMode[1] = 0
-        difficultMode[2] = 0
+        difficultMode = 0
         checkBoxes[1].deselect()
         checkBoxes[2].deselect()
     if whoCalled == 1:
-        difficultMode[0] = 0
-        difficultMode[1] = 1
-        difficultMode[2] = 0
+        difficultMode = 1
         checkBoxes[0].deselect()
         checkBoxes[2].deselect()
     if whoCalled == 2:
-        difficultMode[0] = 0
-        difficultMode[1] = 0
-        difficultMode[2] = 1
+        difficultMode = 2
         checkBoxes[0].deselect()
         checkBoxes[1].deselect()
 
@@ -79,9 +74,10 @@ def on_closing(threadMenager):
 
 
 
-def startGame(startFrame, threadMenager):
+def startGame(startFrame, threadMenager, map):
     global start
-    threadMenager.mobSpawnerPeriod = 5
+    threadMenager.setDifficulty(difficultMode)
+    map.setDifficult(difficultMode)
     canvas.delete("startScreen")
     start = True
     startFrame.destroy()
@@ -113,7 +109,7 @@ def mainLoop(player, photos, threadMenager):
         canvas.delete("bar")
         canvas.create_rectangle(width - 240, 0, width, 40, fill="white", tags="bar")
         canvas.create_text(width - 80, 25, text="bullets: " + str(player.ammo), fill="black", font=('Helvetica', 15), tags="bar")
-        canvas.create_text(width - 200, 25, text="score: " + str(player.score), fill="black", font=('Helvetica', 15), tags="bar")
+        canvas.create_text(width - 198, 25, text="score: " + str(player.score), fill="black", font=('Helvetica', 15), tags="bar")
         canvas.create_rectangle(40, 0, 160, 40, fill="white", tags="bar")
         canvas.create_rectangle(40, 0, 40 + 120 * (threadMenager.bulletDropperStatus / threadMenager.bulletsDropperPeriod), 40, fill="green yellow", tags="bar")
         canvas.create_text(100, 20, text="Next bullet", fill="black", font=('Helvetica', 15), tags="bar")
@@ -128,7 +124,7 @@ def mainLoop(player, photos, threadMenager):
 
 map = MapLoader("Resources/map.txt")
 threadMenager = ThreadMenager(map)
-createWindow(map.get_size(), threadMenager)
+createWindow(map.get_size(), threadMenager, map)
 player = Player(threadMenager, map.findEmptyPlace(), map)
 threadMenager.add_thread(player)
 
