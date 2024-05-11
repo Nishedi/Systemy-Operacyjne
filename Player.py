@@ -19,8 +19,9 @@ class Player(Object):
 
         self.direction = 'Right'
         self.spawn()
-        self.thread.start()
 
+    def startThread(self):
+        self.thread.start()
 
     def addOneScore(self):
         try:

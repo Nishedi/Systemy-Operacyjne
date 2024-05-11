@@ -10,6 +10,8 @@ class Enemy(Object):
         self.letter = 'E'
         self.spawn()
         self.threadMenager = threadMenager
+
+    def startThread(self):
         self.thread.start()
 
     def spawn(self):

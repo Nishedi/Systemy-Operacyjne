@@ -78,6 +78,7 @@ def mainLoop(player, photos, threadMenager):
         if time.time() - startTime > 10:
             canvas.delete("startScreen")
             start = True
+            threadMenager.startThreads()
     if not threadMenager.isRunning and start:
         canvas.create_rectangle(width/2-300, height/2-200 , width/2+300, height/2+200, fill="magenta")
         canvas.create_text(width / 2, height / 2, text="Koniec gry!", fill="black",
