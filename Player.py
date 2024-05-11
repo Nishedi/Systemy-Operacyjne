@@ -15,13 +15,8 @@ class Player(Object):
         self.threadMenager = threadMenager
         self.player_image = PhotoImage(file="pictures/player_right.png")
         self.letter = 'P'
-        # self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
-
         self.direction = 'Right'
         self.spawn()
-
-    def startThread(self):
-        self.thread.start()
 
     def addOneScore(self):
         try:
@@ -31,14 +26,8 @@ class Player(Object):
             self.mutex.release()
     def add_score(self, score):
         self.score += score
-    def spawn(self):
-        try:
-            self.mapObject.mutex.acquire()
-            possition = self.mapObject.findEmptyPlace()
-            self.possition[0], self.possition[1] = possition[1], possition[0]
-            self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
-        finally:
-            self.mapObject.mutex.release()
+
+
     def changePhotoDirection(self):
         if (self.direction == 'Up'):
             self.player_image = PhotoImage(file="pictures//player_up.png")
@@ -55,15 +44,18 @@ class Player(Object):
 
     def shoot(self):
         if self.ammo > 0:
-            self.ammo -= 1
-            if self.direction == 'Right':
+            if self.direction == 'Right' and self.mapObject.get_what_is_in(self.possition[0]+1, self.possition[1]) == ' ':
                 Bullet(self.get_possition()[0]+1, self.get_possition()[1], self.direction, self.threadMenager, self.mapObject, self)
-            if self.direction == 'Left':
+                self.ammo -= 1
+            if self.direction == 'Left' and self.mapObject.get_what_is_in(self.possition[0]-1, self.possition[1]) == ' ':
                 Bullet(self.get_possition()[0]-1, self.get_possition()[1], self.direction, self.threadMenager, self.mapObject, self)
-            if self.direction == 'Up':
+                self.ammo -= 1
+            if self.direction == 'Up' and self.mapObject.get_what_is_in(self.possition[0], self.possition[1]-1) == ' ':
                 Bullet(self.get_possition()[0], self.get_possition()[1]-1, self.direction, self.threadMenager, self.mapObject, self)
-            if self.direction == 'Down':
+                self.ammo -= 1
+            if self.direction == 'Down' and self.mapObject.get_what_is_in(self.possition[0], self.possition[1]+1) == ' ':
                 Bullet(self.get_possition()[0], self.get_possition()[1]+1, self.direction, self.threadMenager, self.mapObject, self)
+                self.ammo -= 1
 
     def get_score(self):
         return self.score
@@ -78,21 +70,19 @@ class Player(Object):
         if self.mapObject.get_what_is_in(self.possition[0], self.possition[1]) == 'A':
             self.add_ammo()
     def move(self, mode=1):
-        collision = [0,0,0,0,0]
         try:
             self.mapObject.mutex.acquire()
             collision = self.checkCollision(self.map, self.direction)
-
-            # if collision[0]==0:
-            #     self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
-            # if self.direction == 'Up' and collision[4]!=1:
-            #     self.possition[1] -= 1
-            # if self.direction == 'Down' and collision[3]!=1:
-            #     self.possition[1] += 1
-            # if self.direction == 'Left' and collision[2]!=1:
-            #     self.possition[0] -= 1
-            # if self.direction == 'Right' and collision[1]!=1:
-            #     self.possition[0] += 1
+            if collision[0]==0:
+                self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
+            if self.direction == 'Up' and collision[4]!=1:
+                self.possition[1] -= 1
+            if self.direction == 'Down' and collision[3]!=1:
+                self.possition[1] += 1
+            if self.direction == 'Left' and collision[2]!=1:
+                self.possition[0] -= 1
+            if self.direction == 'Right' and collision[1]!=1:
+                self.possition[0] += 1
             self.checkMap()
             self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
 
@@ -104,9 +94,5 @@ class Player(Object):
         if event.keysym == 'Up' or event.keysym == 'Down' or event.keysym == 'Left' or event.keysym == 'Right':
             self.direction = event.keysym
             self.changePhotoDirection()
-
         if event.keysym == 'space':
             self.shoot()
-
-
-

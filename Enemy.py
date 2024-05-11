@@ -11,18 +11,6 @@ class Enemy(Object):
         self.spawn()
         self.threadMenager = threadMenager
 
-    def startThread(self):
-        self.thread.start()
-
-    def spawn(self):
-        try:
-            self.mapObject.mutex.acquire()
-            possition = self.mapObject.findEmptyPlace()
-            self.possition[0], self.possition[1] = possition[1], possition[0]
-            self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
-        finally:
-            self.mapObject.mutex.release()
-
     def findPlayer(self, distance=10):
         for i in range(self.possition[1] - distance, self.possition[1] + distance):
             for j in range(self.possition[0] - distance, self.possition[0] + distance):

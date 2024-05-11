@@ -10,6 +10,17 @@ class Object:
         self.thread = threading.Thread(target=self.threadLoop, args=())
         self.mutex = threading.Lock()
 
+    def startThread(self):
+        self.thread.start()
+
+    def spawn(self):
+        try:
+            self.mapObject.mutex.acquire()
+            possition = self.mapObject.findEmptyPlace()
+            self.possition[0], self.possition[1] = possition[1], possition[0]
+            self.mapObject.update_map(self.possition[0], self.possition[1], self.letter)
+        finally:
+            self.mapObject.mutex.release()
 
     def get_possition(self):
         try:
