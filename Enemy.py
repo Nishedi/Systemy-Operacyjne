@@ -31,7 +31,7 @@ class Enemy(Object):
             return 1
         return 0
 
-    def move(self, mode=1): # Function which move enemy
+    def move(self): # Function which move enemy
         try:
             self.mapObject.mutex.acquire() # Lock the map mutex to avoid synchronization problems
             playerPossition = self.mapObject.findPlayer(self.possition) # Find where player is

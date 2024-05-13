@@ -62,14 +62,46 @@ class Player(Object):
 
     def threadLoop(self):
         while self.isRunning:
-            self.move(0)
+            self.move()
             time.sleep(0.5)
         print("End of the game!")
+
+    def checkCollision(self, map, direction):
+        a = self.possition
+        res = [0,0,0,0,0]
+        whatIsHere = ' '
+        right = self.mapObject.get_what_is_in(a[0]+1, a[1])
+        left = self.mapObject.get_what_is_in(a[0]-1, a[1])
+        up = self.mapObject.get_what_is_in(a[0], a[1]-1)
+        down = self.mapObject.get_what_is_in(a[0], a[1]+1)
+        if right == 'X' or right == 'E':
+            if direction == 'Right':
+                whatIsHere = right
+                res[0] = 1
+                res[1] = 1
+        if left == 'X' or left == 'E':
+            if direction == 'Left':
+                whatIsHere = left
+                res[0] = 1
+                res[2] = 1
+        if up == 'X' or up == 'E':
+            if direction == 'Up':
+                whatIsHere = up
+                res[0] = 1
+                res[4] = 1
+        if down == 'X' or down == 'E':
+            if direction == 'Down':
+                whatIsHere = down
+                res[0] = 1
+                res[3] = 1
+        if whatIsHere == 'E':
+            self.threadMenager.closeAll()
+        return res
 
     def checkMap(self):
         if self.mapObject.get_what_is_in(self.possition[0], self.possition[1]) == 'A':
             self.add_ammo()
-    def move(self, mode=1):
+    def move(self):
         try:
             self.mapObject.mutex.acquire()
             collision = self.checkCollision(self.map, self.direction)
