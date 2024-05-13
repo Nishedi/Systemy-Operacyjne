@@ -40,8 +40,7 @@ class Player(Object):
 
     def shoot(self):  # Shoot
         if self.ammo > 0:
-            if self.direction == 'Right' and not self.mapObject.get_what_is_in(self.possition[0] + 1, self.possition[
-                1]) == 'X':  # if there is no wall on the right
+            if self.direction == 'Right' and (not self.mapObject.get_what_is_in(self.possition[0] + 1, self.possition[1]) == 'X'):  # if there is no wall on the right
                 Bullet(self.get_possition()[0] + 1, self.get_possition()[1], self.direction, self.threadMenager,
                        self.mapObject, self)  # create bullet thread
                 self.ammo -= 1
