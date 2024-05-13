@@ -97,18 +97,18 @@ def mainLoop(player, photos, threadMenager): # main loop of the game visualisati
         canvas.delete("player") # delete player
         canvas.create_image(player.possition[0] * 40, player.possition[1] * 40, anchor='nw', image=player.player_image, tags="player") # draw player
         canvas.delete("bar") # delete bar
-        canvas.create_rectangle(width - 240, 0, width, 40, fill="white", tags="bar") # draw bar
+        canvas.create_rectangle(width - 240, 0, width, 40, fill="ghostwhite", tags="bar") # draw bar
         canvas.create_text(width - 80, 25, text="bullets: " + str(player.ammo), fill="black", font=('Helvetica', 15), tags="bar") # draw text how many bullets left
         canvas.create_text(width - 198, 25, text="score: " + str(player.score), fill="black", font=('Helvetica', 15), tags="bar") # draw text how many points player has
-        canvas.create_rectangle(40, 0, 160, 40, fill="white", tags="bar") # draw rectangle for visibility of next bullet
-        canvas.create_rectangle(40, 0, 40 + 120 * (threadMenager.bulletDropperStatus / threadMenager.bulletsDropperPeriod), 40, fill="green yellow", tags="bar") # draw status of next bullet spawn
-        canvas.create_text(100, 20, text="Next bullet", fill="black", font=('Helvetica', 15), tags="bar") # draw text for next bullet spawn
-        canvas.create_rectangle(200, 0, 320, 40, fill="white", tags="bar") # draw rectangle for visibility of next enemy
-        canvas.create_rectangle(200, 0, 200 + 120 * (threadMenager.mobSpawnerStatus / threadMenager.mobSpawnerPeriod), 40, fill="aqua", tags="bar") # draw status of next enemy spawn
-        canvas.create_text(260, 20, text="Next enemy", fill="black", font=('Helvetica', 15), tags="bar")    # draw text for next enemy spawn
+        canvas.create_rectangle(40, 0, 160, 40, fill="black", tags="bar") # draw rectangle for visibility of next bullet
+        canvas.create_rectangle(40, 0, 40 + 120 * (threadMenager.bulletDropperStatus / threadMenager.bulletsDropperPeriod), 40, fill="darkgoldenrod", tags="bar") # draw status of next bullet spawn
+        canvas.create_text(100, 20, text="Next bullet", fill="white", font=('Helvetica', 15), tags="bar") # draw text for next bullet spawn
+        canvas.create_rectangle(200, 0, 320, 40, fill="black", tags="bar") # draw rectangle for visibility of next enemy
+        canvas.create_rectangle(200, 0, 200 + 120 * (threadMenager.mobSpawnerStatus / threadMenager.mobSpawnerPeriod), 40, fill="olivedrab", tags="bar") # draw status of next enemy spawn
+        canvas.create_text(260, 20, text="Next enemy", fill="white", font=('Helvetica', 15), tags="bar")    # draw text for next enemy spawn
     if not threadMenager.isRunning and start: # if game is started and is threads are stopped
-        canvas.create_rectangle(width / 2 - 300, height / 2 - 200, width / 2 + 300, height / 2 + 200, fill="magenta")
-        canvas.create_text(width / 2, height / 2, text="Koniec gry!", fill="black",
+        canvas.create_rectangle(width / 2 - 300, height / 2 - 200, width / 2 + 300, height / 2 + 200, fill="black")
+        canvas.create_text(width / 2, height / 2, text="Koniec gry!", fill="maroon",
                            font=('Helvetica', 50))
     root.after(100, lambda: mainLoop(player, photos, threadMenager)) # call main loop again
 
