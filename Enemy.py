@@ -34,7 +34,6 @@ class Enemy(Object):
     def move(self, mode=1): # Function which move enemy
         try:
             self.mapObject.mutex.acquire() # Lock the map mutex to avoid synchronization problems
-            self.mapObject.update_map(self.possition[0], self.possition[1], ' ') # Remove enemy from the map
             playerPossition = self.mapObject.findPlayer(self.possition) # Find where player is
             if playerPossition: # If player is found, find the nearest path to him
                 possition = self.mapObject.findNearestPath(playerPossition, self.possition)
@@ -46,6 +45,7 @@ class Enemy(Object):
                 if len(goodNeighbours) == 0: # If there is no empty neighbours, return
                     return
                 possition = goodNeighbours[random.randint(0, len(goodNeighbours)-1)] # Choose random neighbour
+            self.mapObject.update_map(self.possition[0], self.possition[1], ' ') # Remove enemy from the map
             self.possition = possition # Set new possition
             self.mapObject.update_map(self.possition[0],self.possition[1], self.letter) # Update map
         finally: # No matter what unlock the mutex
