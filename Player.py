@@ -44,16 +44,16 @@ class Player(Object):
 
     def shoot(self):
         if self.ammo > 0:
-            if self.direction == 'Right' and self.mapObject.get_what_is_in(self.possition[0]+1, self.possition[1]) == ' ':
+            if self.direction == 'Right' and not self.mapObject.get_what_is_in(self.possition[0]+1, self.possition[1]) == 'X':
                 Bullet(self.get_possition()[0]+1, self.get_possition()[1], self.direction, self.threadMenager, self.mapObject, self)
                 self.ammo -= 1
-            if self.direction == 'Left' and self.mapObject.get_what_is_in(self.possition[0]-1, self.possition[1]) == ' ':
+            if self.direction == 'Left' and not self.mapObject.get_what_is_in(self.possition[0]-1, self.possition[1]) == 'X':
                 Bullet(self.get_possition()[0]-1, self.get_possition()[1], self.direction, self.threadMenager, self.mapObject, self)
                 self.ammo -= 1
-            if self.direction == 'Up' and self.mapObject.get_what_is_in(self.possition[0], self.possition[1]-1) == ' ':
+            if self.direction == 'Up' and not self.mapObject.get_what_is_in(self.possition[0], self.possition[1]-1) == 'X':
                 Bullet(self.get_possition()[0], self.get_possition()[1]-1, self.direction, self.threadMenager, self.mapObject, self)
                 self.ammo -= 1
-            if self.direction == 'Down' and self.mapObject.get_what_is_in(self.possition[0], self.possition[1]+1) == ' ':
+            if self.direction == 'Down' and not self.mapObject.get_what_is_in(self.possition[0], self.possition[1]+1) == 'X':
                 Bullet(self.get_possition()[0], self.get_possition()[1]+1, self.direction, self.threadMenager, self.mapObject, self)
                 self.ammo -= 1
 

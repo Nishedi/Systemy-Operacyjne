@@ -14,7 +14,7 @@ class Bullet(Object):
 
 
     def threadLoop(self):
-        self.mapObject.update_map(self.possition[0], self.possition[1], 'B')
+        self.checkCollisionEnemy()
         while self.isRunning:
             self.move()
             time.sleep(0.1)
@@ -45,6 +45,13 @@ class Bullet(Object):
                 res[3] = 1
         return res
 
+    def checkCollisionEnemy(self):
+        if self.threadMenager.checkHitting(self.possition):
+            self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
+            self.player.addOneScore()
+            self.isRunning = False
+            return True
+
     def move(self, mode=1):
         try:
             self.mapObject.mutex.acquire()
@@ -58,10 +65,7 @@ class Bullet(Object):
                 self.possition[0] -= 1
             if self.direction == 'Right' and collision[1] != 1:
                 self.possition[0] += 1
-            if self.threadMenager.checkHitting(self.possition):
-                self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
-                self.player.addOneScore()
-                self.isRunning = False
+            if self.checkCollisionEnemy():
                 return
             if collision[0] == 1:
                 self.mapObject.update_map(self.possition[0], self.possition[1], ' ')
