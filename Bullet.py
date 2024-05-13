@@ -2,7 +2,7 @@ from Object import Object
 import time
 class Bullet(Object):
     def __init__(self, x, y, direction, threadMenager, map, player):
-        super().__init__(x, y, map)
+        self.possition = [y, x]
         self.direction = direction # direction of the bullet (where it is going)
         self.threadMenager = threadMenager # threadMenager object that will be used to check if bullet hit an enemy
         self.mapObject.update_map(self.possition[0], self.possition[1], 'B') # update map with bullet

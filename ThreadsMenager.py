@@ -43,7 +43,7 @@ class ThreadMenager:
             while self.mobSpawnerStatus < self.mobSpawnerPeriod:
                 time.sleep(1)
                 self.mobSpawnerStatus += 1
-            enemy = Enemy((0, 0), map, self)
+            enemy = Enemy( map, self)
             enemy.startThread()
             self.add_thread(enemy)
 

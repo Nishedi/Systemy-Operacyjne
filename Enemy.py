@@ -3,11 +3,11 @@ import random
 from Object import Object
 
 class Enemy(Object):
-    def __init__(self, possition, map, threadMenager):
-        super().__init__(possition[1], possition[0], map)
-        self.letter = 'E'
-        self.spawn()
-        self.threadMenager = threadMenager
+    def __init__(self, map, threadMenager):
+        super().__init__(map)
+        self.letter = 'E' # Letter which represent enemy on the map
+        self.spawn() # Spawn enemy on empty place
+        self.threadMenager = threadMenager #threadMenager to stop the game
 
     def spawn(self): # Function which spawn enemy
         try:
@@ -34,7 +34,7 @@ class Enemy(Object):
     def move(self): # Function which move enemy
         try:
             self.mapObject.mutex.acquire() # Lock the map mutex to avoid synchronization problems
-            playerPossition = self.mapObject.findPlayer(self.possition) # Find where player is
+            playerPossition = self.mapObject.findPlayer(self.possition, self.mapObject.rangeDistance) # Find where player is
             if playerPossition: # If player is found, find the nearest path to him
                 possition = self.mapObject.findNearestPath(playerPossition, self.possition)
             if not playerPossition or not possition: # If player is not found or path is not found, move randomly

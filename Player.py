@@ -7,9 +7,8 @@ from Object import Object
 
 class Player(Object):
 
-    def __init__(self, threadMenager, possition, map):
-        possition = (12, 10)
-        super().__init__(possition[1], possition[0], map)
+    def __init__(self, threadMenager, map):
+        super().__init__(map)
         self.score = 0
         self.ammo = 10
         self.threadMenager = threadMenager

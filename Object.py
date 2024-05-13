@@ -2,8 +2,8 @@ import random
 import threading
 import time
 class Object:
-    def __init__(self, x, y, map):
-        self.possition = [x, y]
+    def __init__(self, map):
+        self.possition = [0, 0]
         self.mapObject = map
         self.map = self.mapObject.map
         self.isRunning = True
