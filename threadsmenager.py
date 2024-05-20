@@ -15,7 +15,7 @@ class Threadmenager:
         self.enemy_threads = [] # this is a list of all enemies nothing more
         self.all_threads = [] # this is a list of all threads that are running to control all game
         self.mutex = threading.Lock() # this is a lock used to protect the list of threads
-        self.is_running = True # this is a flag used to stop all threads (including this)
+        self.is_running = False # this is a flag used to stop all threads (including this)
         # this is a thread that will drop bullets
         self.bullets_dropper_thread = threading.Thread(target=self.bullets_dropper, args=(map2d,))
         self.bullet_dropper_status = 0 # 0 - not dropping
@@ -44,6 +44,7 @@ class Threadmenager:
         """
         this method will start all threads = start the game
         """
+        self.is_running = True
         for thread in self.all_threads:
             thread.start_thread()
         self.bullets_dropper_thread.start()
@@ -57,14 +58,16 @@ class Threadmenager:
         while self.is_running:
             if time.time()-self.start_time>30*incrementer:
                 incrementer+=1
-                self.mob_spawner_period-=1
+                if self.mob_spawner_period>1:
+                    self.mob_spawner_period-=1
             self.mob_spawner_status = 0
             while self.mob_spawner_status < self.mob_spawner_period:
                 time.sleep(1)
                 self.mob_spawner_status += 1
             enemy = Enemy(map2d, self)
             enemy.start_thread()
-            self.add_thread(enemy)
+            if enemy.is_running:
+                self.add_thread(enemy)
 
     def bullets_dropper(self, map2d):
         """
@@ -102,12 +105,17 @@ class Threadmenager:
         """
         this is a method that will stop all threads = end the game
         """
-        self.is_running = False
-        self.bullets_dropper_thread.join()
-        self.mob_spawner_thread.join()
+        if self.is_running:
+            self.is_running = False
+        if self.bullets_dropper_thread.is_alive():
+            self.bullets_dropper_thread.join()
+        if self.mob_spawner_thread.is_alive():
+            self.mob_spawner_thread.join()
+
         for thread in self.all_threads:
-            thread.is_running = False
-            thread.thread.join()
+            if thread.thread.is_alive():
+                thread.is_running = False
+                thread.thread.join()
 
     def check_hitting(self, possition):
         """

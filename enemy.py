@@ -15,8 +15,17 @@ class Enemy(Object):
         """
         super().__init__(map2d)
         self.letter = 'E' # Letter which represent enemy on the map
-        self.spawn() # Spawn enemy on empty place
         self.thread_menager = thread_menager #threadMenager to stop the game
+
+
+    def start_thread(self):
+        """
+        Function to start the enemy thread.
+        """
+        if self.spawn(): # Spawn enemy on empty place
+            self.thread.start()
+        else:
+            self.is_running = False
 
     def spawn(self):
         """
@@ -28,10 +37,11 @@ class Enemy(Object):
             # Find empty place which is not near player
             possition = self.map_object.find_empty_place_enemy()
             if not possition: # If there is no empty place,
-                return # return
+                return False# return
             self.possition[0], self.possition[1] = possition[1], possition[0] # Set new possition
             # Update map
             self.map_object.update_map(self.possition[0], self.possition[1], self.letter)
+            return True
         finally:
             self.map_object.mutex.release() # No matter what unlock the mutex
 
@@ -43,9 +53,6 @@ class Enemy(Object):
         if self.map_object.get_what_is_in(a[0], a[1]) == 'E': # Check if there is enemy
             return 1
         if self.map_object.get_what_is_in(a[0], a[1]) == 'X': # Check if there is wall
-            return 1
-        if self.map_object.get_what_is_in(a[0], a[1]) == 'B': # Check if there is player
-            self.is_running = False
             return 1
         if self.map_object.get_what_is_in(a[0], a[1]) == 'P': # Check if there is player
             self.thread_menager.close_all()
@@ -75,6 +82,11 @@ class Enemy(Object):
                     return
                 # Choose random neighbour
                 possition = good_neighbours[random.randint(0, len(good_neighbours)-1)]
+                # Check if there is bullet on the new possition
+                if self.map_object.get_what_is_in(possition[0], possition[1]) == 'B':
+                    self.is_running = False
+                    self.thread_menager.remove_thread(self)
+                    return
             # Remove enemy from the map
             self.map_object.update_map(self.possition[0], self.possition[1], ' ')
             self.possition = possition # Set new possition

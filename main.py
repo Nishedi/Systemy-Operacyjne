@@ -86,11 +86,13 @@ def key_press(event):
 
 
 def on_closing(thread_menager_close):
+    global ROOT
     """
     Function defining what to do when window is closing.
     """
     print("The window is closing...")
     thread_menager_close.close_all()
+    ROOT.destroy()
 
 
 def start_game(start_frame, thread_menager_starter, map2d):
@@ -116,6 +118,7 @@ def main_loop(player_object, photos, thread_menager_loop):
         CANVAS.delete("border")  # delete all borders
         CANVAS.delete('enemy')  # delete all enemies
         CANVAS.delete('ammo')  # delete all ammos
+        CANVAS.create_rectangle(0, 0, WIDTH, HEIGHT, fill="dimgrey")  # create white background
         for i in range(len(mapObject.map2d)):  # draw all borders, enemies and ammos from map
             for j in range(len(mapObject.map2d[i])):
                 if mapObject.map2d[i][j] == 'A':
@@ -169,6 +172,7 @@ def main_loop(player_object, photos, thread_menager_loop):
                                 WIDTH / 2 + 300, HEIGHT / 2 + 200, fill="black")
         CANVAS.create_text(WIDTH / 2, HEIGHT / 2, text="Koniec gry!", fill="maroon",
                            font=('Helvetica', 50))
+
     ROOT.after(100, lambda: main_loop(player, photos, thread_menager_loop))  # call main loop again
 
 

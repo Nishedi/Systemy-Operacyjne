@@ -93,8 +93,9 @@ class MapLoader:
         counter = 0
         while player_possition and counter < 1000:
             possition = self.find_empty_place()
+            player_possition = self.find_player([possition[1], possition[0]], self.spawn_zone)
             counter += 1
-        if player_possition:
+        if player_possition or possition[0] == 0 or possition[1] == 0:
             return False
         return possition
 
@@ -142,6 +143,7 @@ class MapLoader:
                     if self.check_collision(neighbour)==0: # if neighbour is empty
                         return neighbour # return neighbour
             except:
+                print(end_position)
                 print(neighbour)
 
         return False # return False - cant move

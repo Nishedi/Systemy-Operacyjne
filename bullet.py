@@ -81,7 +81,10 @@ class Bullet(Object):
             # check if there is any collision
             collision = self.check_collision(self.direction)
             # remove bullet from the map
-            self.map_object.update_map(self.possition[0], self.possition[1], ' ')
+            previous_possition = self.possition.copy()
+            if self.check_collision_enemy(): # check if bullet hit an enemy
+                return # if bullet hit an enemy, return
+            self.map_object.update_map(previous_possition[0], previous_possition[1], ' ')
             # if bullet is going up and there is no collision up
             if self.direction == 'Up' and collision[4] != 1:
                 self.possition[1] -= 1 # move bullet up
@@ -98,7 +101,6 @@ class Bullet(Object):
                 return # if bullet hit an enemy, return
             if collision[0] == 1: # if there is any collision
                 # remove bullet from the map
-                self.map_object.update_map(self.possition[0], self.possition[1], ' ')
                 self.is_running = False # end the bullet thread
             else: # if there is no collision
                 # update map with bullet
